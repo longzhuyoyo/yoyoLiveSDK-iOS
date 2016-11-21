@@ -168,7 +168,7 @@ typedef void(^CallBackBlock)(id response);
 -(void) setThirdShare {
     sdkTool.isOpenThirdShare = !sdkTool.isOpenThirdShare;
     
-    [YoyoApi setThirdShareEnable:!sdkTool.isOpenThirdShare];
+    [YoyoApi setThirdShareEnable:sdkTool.isOpenThirdShare];
     if (sdkTool.isOpenThirdShare) {
         [YoyoPopView createTipLabel:@"开启房间分享功能!"];
     } else {
