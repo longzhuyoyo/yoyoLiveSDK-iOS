@@ -14,18 +14,6 @@
  */
 @property (nonatomic, unsafe_unretained) BOOL isLogin;
 /**
- *  支持守护状态
- */
-@property (nonatomic, unsafe_unretained) BOOL isSupportGuard;
-/**
- *  支持兑换状态
- */
-@property (nonatomic, unsafe_unretained) BOOL isSupportExchange;
-/**
- *  支持错误信息状态
- */
-@property (nonatomic, unsafe_unretained) BOOL isOpenServierErrorMsgPopView;
-/**
  *  log状态
  */
 @property (nonatomic, unsafe_unretained) BOOL isOpenLog;

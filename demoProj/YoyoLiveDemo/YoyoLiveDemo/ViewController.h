@@ -7,16 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-@class YoyoPopView;
+@class YoyoPopView,YoyoSingerListRecord;
 @interface ViewController : UIViewController
-/**
- *  登录页面
- */
-@property (nonatomic, weak) YoyoPopView *loginView;
 /**
  *  登录处理
  */
-- (void) showLoginView ;
-
+- (YoyoPopView*) showLoginView ;
 @end
 

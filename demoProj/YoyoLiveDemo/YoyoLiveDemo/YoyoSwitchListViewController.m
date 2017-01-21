@@ -7,7 +7,6 @@
 //
 
 #import "YoyoSwitchListViewController.h"
-#import "YoyoApi.h"
 #import "YoyoPopView.h"
 #import "AFServer.h"
 #import "YoyoPopView.h"
@@ -18,7 +17,7 @@ typedef void(^CallBackBlock)(id response);
 #define StringIsEmpty(string) ((string) == nil || (string).length == 0)
 #define SCREEN_WIDTH [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
-@interface YoyoSwitchListViewController ()<UITableViewDelegate, UITableViewDataSource>
+@interface YoyoSwitchListViewController ()<UITableViewDelegate, UITableViewDataSource,YoyoSdkToolDelegate>
 /**
  *  tableView
  */
@@ -52,13 +51,9 @@ typedef void(^CallBackBlock)(id response);
  */
 @property (nonatomic, unsafe_unretained) BOOL pendingExchange;
 /**
- *  loadingview
+ *  登录页面
  */
-@property (nonatomic, weak) UIActivityIndicatorView *loadingView;
-/**
- *  歌手列表模型
- */
-@property (nonatomic, readonly, strong) YoyoSingerListRecord *singerListRecord;
+@property (nonatomic, weak) YoyoPopView *loginView;
 @end
 
 @implementation YoyoSwitchListViewController{
@@ -76,9 +71,27 @@ typedef void(^CallBackBlock)(id response);
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    // 网络数据回调
-    [self handleNetDataCallBack];
+    
+    sdkTool.delegate = self;
 }
+
+
+#pragma mark - yoyoSdkDelegate
+- (void) yoyoSdkToolCallBackErrorData:(id)errorData {
+    NSLog(@"statusStr = %@",errorData);
+}
+
+- (void)yoyoSdkToolCallBackUserInfoWhenSuccess {
+    [YoyoPopView createTipLabel:@"更新SDK用户信息成功!"];
+    [self.updateInfoView removeFromSuperview];
+}
+
+- (void)yoyoSdkToolCallBackWhenLoginSuccess {
+    [self.loginView removeFromSuperview];
+    [YoyoPopView createTipLabel:@"SDK登录成功!"];
+    [self setUpdateUserInfo];
+}
+
 /**
  *  初始化子控件
  */
@@ -117,30 +130,10 @@ typedef void(^CallBackBlock)(id response);
 -(void) initCell{
     [self addCellWithName:@"更新个人信息" selector:@selector(setUpdateUserInfo)];
     [self addCellWithName:@"退出登录" selector:@selector(setLoginOut)];
-    [self addCellWithName:@"分享开关" selector:@selector(setThirdShare)];
+   // [self addCellWithName:@"分享开关" selector:@selector(setThirdShare)];
     [self addCellWithName:@"设置审核版本" selector:@selector(setReviewVersion)];
     [self addCellWithName:@"SDKDebugLog开关" selector:@selector(setDebugLog)];
-    [self addCellWithName:@"服务器错误弹出框开关" selector:@selector(setServerErrorMsgPopViewEnable)];
-    [self addCellWithName:@"兑换功能开关" selector:@selector(setIsExchangeSupport)];
-    [self addCellWithName:@"守护功能开关" selector:@selector(setIsOpenGuardSupport)];
-}
-
-#pragma mark - NetDataCallBack
-/**
- *  网络数据回调处理
- */
-- (void) handleNetDataCallBack {
-    __weak typeof(self) weakSelf = self;
-    [sdkTool setResponseBlock:^(YoyoBaseResp *response) {
-       if ([YoyoServerMethodNameUpdateUserInfo isEqualToString:response.method]) {
-            [YoyoPopView createTipLabel:@"更新SDK用户信息成功!"];
-           [weakSelf.updateInfoView removeFromSuperview];
-       } else if ([YoyoServerMethodNameLogin isEqualToString:response.method]) {
-           [weakSelf.viewController.loginView removeFromSuperview];
-           [YoyoPopView createTipLabel:@"SDK登录成功!"];
-           [weakSelf setUpdateUserInfo];
-       }
-    }];
+    [self addCellWithName:@"自定义分享平台" selector:@selector(setThirdSharePlatform)];
 }
 
 #pragma mark - Event Response
@@ -149,14 +142,14 @@ typedef void(^CallBackBlock)(id response);
  */
 -(void) setUpdateUserInfo{
     if (!sdkTool.isLogin) {
-        [self.viewController showLoginView];
+      self.loginView = [self.viewController showLoginView];
         [YoyoPopView createTipLabel:@"请先登录SDK!"];
         return;
     }
     YoyoPopView *popView = [[YoyoPopView alloc] init];
     popView.frame = self.view.bounds;
     [popView initYoyoPopViewWithTestFilePlaceNameArr:@[@"AvatarUrl",@"alias"] title:@"更新用户信息" OnClickConfigureBlock:^(NSDictionary *textFileContent) {
-        [YoyoApi updateUserAvatarUrl:textFileContent[@"AvatarUrl"] alias:textFileContent[@"alias"]];
+        [YoyoSdkTool yoyoSdkToolUpdateAvatarUrl:textFileContent[@"AvatarUrl"] alias:textFileContent[@"alias"]];
     }];
     [self.window addSubview:popView];
     self.updateInfoView = popView;
@@ -168,7 +161,7 @@ typedef void(^CallBackBlock)(id response);
 -(void) setThirdShare {
     sdkTool.isOpenThirdShare = !sdkTool.isOpenThirdShare;
     
-    [YoyoApi setThirdShareEnable:sdkTool.isOpenThirdShare];
+    [YoyoSdkTool  yoyoSdkToolSetThirdSharePlatformWithThirdType:@[@(YoyoShareTypeWX)]];
     if (sdkTool.isOpenThirdShare) {
         [YoyoPopView createTipLabel:@"开启房间分享功能!"];
     } else {
@@ -181,8 +174,7 @@ typedef void(^CallBackBlock)(id response);
  */
 -(void) setReviewVersion{
     sdkTool.isOpenReviewVersin = !sdkTool.isOpenReviewVersin;
-    
-    [YoyoApi setReviewVersion:sdkTool.isOpenReviewVersin];
+
     if (sdkTool.isOpenReviewVersin) {
         [YoyoPopView createTipLabel:@"设置房间为审核版本!"];
     } else {
@@ -198,7 +190,7 @@ typedef void(^CallBackBlock)(id response);
         [YoyoPopView createTipLabel:@"您还没有登录SDK!"];
         return;
     }
-    [YoyoApi logout];
+    [YoyoSdkTool yoyoSdkToolSetLoginOut];
     [YoyoPopView createTipLabel:@"SDK退出登录!"];
     sdkTool.isLogin = NO;
 }
@@ -207,55 +199,21 @@ typedef void(^CallBackBlock)(id response);
  */
 -(void) setDebugLog {
     sdkTool.isOpenLog = !sdkTool.isOpenLog;
-    
-    [YoyoApi setDebugLogEnable:sdkTool.isOpenLog];
+
     if (sdkTool.isOpenLog) {
         [YoyoPopView createTipLabel:@"开启SDKLog!"];
     } else {
         [YoyoPopView createTipLabel:@"关闭SDKLog!"];
     }
 }
-/**
- *  服务器错误提示开关
- *
- */
--(void) setServerErrorMsgPopViewEnable{
-    sdkTool.isOpenServierErrorMsgPopView = !sdkTool.isOpenServierErrorMsgPopView;
-    
-    [YoyoApi setServerErrorMsgPopViewEnable:sdkTool.isOpenServierErrorMsgPopView];
-    if (sdkTool.isOpenServierErrorMsgPopView) {
-        [YoyoPopView createTipLabel:@"开启房间服务器错误提示功能!"];
-    } else {
-        [YoyoPopView createTipLabel:@"关闭房间服务器错误提示功能!"];
-    }
-}
-/**
- *  设置是否支持兑换功能
- */
--(void) setIsExchangeSupport{
-    sdkTool.isSupportExchange = !sdkTool.isSupportExchange;
-    
-    [YoyoApi setIsExchangeSupport:sdkTool.isSupportExchange];
-    if (sdkTool.isSupportExchange) {
-        [YoyoPopView createTipLabel:@"开启房间兑换功能!"];
-    } else {
-        [YoyoPopView createTipLabel:@"关闭房间兑换功能!"];
-    }
-}
-/**
- *  设置是否支持守护功能
- */
--(void) setIsOpenGuardSupport{
-    sdkTool.isSupportGuard = !sdkTool.isSupportGuard;
-    
-    [YoyoApi setIsOpenGuardSupport:sdkTool.isSupportGuard];
-    if (sdkTool.isSupportGuard) {
-        [YoyoPopView createTipLabel:@"开启房间守护功能!"];
-    } else {
-        [YoyoPopView createTipLabel:@"关闭房间守护功能!"];
-    }
-}
 
+/**
+ *设置分享平台
+ */
+-(void)setThirdSharePlatform{
+    [YoyoSdkTool yoyoSdkToolSetThirdSharePlatformWithThirdType:@[@(YoyoShareTypeWXTimeLine), @(YoyoShareTypeXinLang), @(YoyoShareTypePasteBoard)]];
+    [YoyoPopView createTipLabel:@"开启分享功能：朋友圈，微博，剪切板!"];
+}
 
 #pragma mark - Privite Method
 /**
@@ -314,7 +272,7 @@ typedef void(^CallBackBlock)(id response);
         UILabel *titleLabel = [[UILabel alloc] init];
         titleLabel.font = [UIFont systemFontOfSize:15];
         titleLabel.textAlignment = NSTextAlignmentCenter;
-        titleLabel.text = @"房间开关功能页";
+        titleLabel.text = @"SDK其他功能";
         [titleLabel sizeToFit];
         [self.view addSubview:titleLabel];
         titleLabel.frame = CGRectMake(titleX, titleY, titleW, titleH);
@@ -333,27 +291,14 @@ typedef void(^CallBackBlock)(id response);
         closeButton.frame = CGRectMake(closeButtontX, closeButtontY, closeButtontW, closeButtontH);
         closeButton.titleLabel.font = [UIFont systemFontOfSize:15];
         [closeButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [closeButton setTitle:@"关闭页面" forState:UIControlStateNormal];
+        [closeButton setTitle:@"观众列表" forState:UIControlStateNormal];
         [closeButton addTarget:self action:@selector(onClosePage) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:closeButton];
         
         _closeBtn = closeButton;
+
     }
     return _closeBtn;
-}
-
--(UIActivityIndicatorView *)loadingView{
-    if (!_loadingView) {
-        UIActivityIndicatorView *loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [self.view addSubview:loadingView];
-        loadingView.center = self.view.center;
-        _loadingView = loadingView;
-    }
-    return _loadingView;
-}
-
--(YoyoSingerListRecord *)singerListRecord{
-    return sdkTool.singerListRecord;
 }
 
 @end

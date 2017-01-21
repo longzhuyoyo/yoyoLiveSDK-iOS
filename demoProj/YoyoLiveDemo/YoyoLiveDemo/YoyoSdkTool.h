@@ -13,14 +13,43 @@
 typedef void(^SdkCallBackDataBlock)(id data);
 typedef void(^SdkCallBackEventBlock)(YoyoEvent event,id data);
 
-@interface YoyoSdkTool : NSObject
-@property (nonatomic, strong) SdkCallBackDataBlock responseBlock;
-@property (nonatomic, strong) SdkCallBackEventBlock eventBlock;
+@protocol YoyoSdkToolDelegate <NSObject>
 
-@property (nonatomic, strong) YoyoSingerListRecord *singerListRecord;
+@optional
+- (void) yoyoSdkToolShowLoginView ;
+
+- (void) yoyoSdkToolShowExchangeView;
+
+- (void) yoyoSdkToolCallBackSingerListDataWithSingerRecord:(YoyoSingerListRecord*)singerListRecord;
+
+- (void) yoyoSdkToolCallBackShareData:(id)data;
+
+- (void) yoyoSdkToolCallBackErrorData:(id)errorData;
+
+- (void) yoyoSdkToolCallBackWhenLoginSuccess;
+
+- (void) yoyoSdkToolCallBackWhenExchangerSuccess;
+
+- (void) yoyoSdkToolCallBackUserInfoWhenSuccess;
+
+@end
+@interface YoyoSdkTool : NSObject
+
+@property (nonatomic,weak) id<YoyoSdkToolDelegate> delegate;
 
 + (instancetype) shareInstance;
 
 + (void) initSdk;
 
++ (void) yoyoSdkToolSetThirdSharePlatformWithThirdType:(NSArray*)thirdTypeArr;
+
++ (void) yoyoSdkToolSetLoginOut;
+
++ (void) yoyoSdkToolEnterRoomWithRoomID:(NSString*)roomID;
+
++ (void) yoyoSdkToolLoginWithOpenID:(NSString*)openID token:(NSString*)token;
+
++ (void) yoyoSdkToolExchangeWithMount:(NSInteger)mount orderId:(NSString*)orderID token:(NSString*)token;
+
++ (void) yoyoSdkToolUpdateAvatarUrl:(NSString*)avatarUrl alias:(NSString*)alias;
 @end

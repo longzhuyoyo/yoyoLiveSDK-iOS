@@ -19,11 +19,11 @@
 #define SINGER_CELL_HEIGHT (SINGER_CELL_WIDTH * 114 / 147)
 #define StringIsEmpty(string) ((string) == nil || (string).length == 0)
 
-@interface ViewController ()< UICollectionViewDelegate, UICollectionViewDataSource>
+@interface ViewController ()< UICollectionViewDelegate, UICollectionViewDataSource,YoyoSdkToolDelegate>
 /**
  *  歌手列表
  */
-@property (nonatomic, readonly, strong) YoyoSingerListRecord *singerListRecord;
+@property (nonatomic, strong) YoyoSingerListRecord *singerListRecord;
 /**
  *  collectionView
  */
@@ -32,10 +32,6 @@
  *  标题
  */
 @property (nonatomic, weak) UILabel *titleLabel;
-/**
- *  loadingView
- */
-@property (nonatomic, weak) UIActivityIndicatorView *loadingView;
 /**
  *  keyWindow
  */
@@ -56,6 +52,10 @@
  *  开关列表页button
  */
 @property (nonatomic, strong) UIButton *switchListButton;
+/**
+ *  登录页面
+ */
+@property (nonatomic, weak) YoyoPopView *loginView;
 @end
 
 @implementation ViewController
@@ -69,23 +69,56 @@
 }
 
 /**
- *  如果sdk工具类的回调block在多个控制器使用需要卸载viewwillappear里,如果在viewdidload中只在控制器创建的时候覆
- *  盖block,在回到某个控制器时会出现覆盖
+ *  如果sdk工具类的回调block在多个控制器使用需要卸载viewwillappear里,如果在viewdidload中只在控制器创建的时候会覆盖代理,在回到某个控制器时会出现覆盖
  *
  */
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    // 网络数据回调
-    [self handleNetDataCallBack];
-    // 事件回到
-    [self handleEventCallBack];
+    
+    [YoyoSdkTool shareInstance].delegate = self;
 }
 - (void) initSubViews {
     self.view.backgroundColor = [UIColor whiteColor];
     [self titleLabel];
     [self switchListButton];
     [self collectionView];
-    [self.loadingView startAnimating];
+    [YoyoPopView startLoadingViewWithSuperView:self.view];
+}
+
+#pragma mark - YoyoSdkToolDelegate
+- (void) yoyoSdkToolShowLoginView {
+    [self showLoginView];
+}
+
+- (void) yoyoSdkToolShowExchangeView {
+    [self showExchangeView];
+}
+
+- (void) yoyoSdkToolCallBackSingerListDataWithSingerRecord:(YoyoSingerListRecord*)singerListRecord {
+    self.singerListRecord = singerListRecord;
+    [self.collectionView reloadData];
+    [YoyoPopView endLoadingView];
+}
+
+- (void) yoyoSdkToolCallBackShareData:(id)data{
+    [self shareData:data];
+}
+
+- (void) yoyoSdkToolCallBackErrorData:(id)errorData {
+    NSLog(@"statusStr = %@",errorData);
+}
+
+- (void) yoyoSdkToolCallBackWhenLoginSuccess {
+    [YoyoPopView createTipLabel:@"SDK登录成功!"];
+    [self.loginView removeFromSuperview];
+    if (self.pendingExchange) {
+        [self showExchangeView];
+    }
+}
+
+- (void) yoyoSdkToolCallBackWhenExchangerSuccess {
+    [YoyoPopView createTipLabel:@"SDK兑换成功!"];
+    [self.exchangeView removeFromSuperview];
 }
 #pragma mark - colletionDelegate
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
@@ -100,64 +133,14 @@
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     YoyoSingerDetailRecord *singerRecord = self.singerListRecord.list[indexPath.item];
-    [YoyoApi enterRoomWithRoomId:singerRecord.roomId];
+    [YoyoSdkTool yoyoSdkToolEnterRoomWithRoomID:singerRecord.roomId];
 }
 
 #pragma mark - Privite Method
-
-/**
- *  网络数据回调处理
- */
-- (void) handleNetDataCallBack {
-    __weak typeof(self) weakSelf = self;
-    [[YoyoSdkTool shareInstance] setResponseBlock:^(YoyoBaseResp *response) {
-        if ([YoyoServerMethodNameGetSingerList isEqualToString:response.method]) {
-            [weakSelf.collectionView reloadData];
-            [weakSelf.loadingView stopAnimating];
-        } else if ([YoyoServerMethodNameLogin isEqualToString:response.method]) {
-            [YoyoPopView createTipLabel:@"SDK登录成功!"];
-            [weakSelf.loginView removeFromSuperview];
-            if (weakSelf.pendingExchange) {
-                [weakSelf showExchangeView];
-            }
-        } else if ([YoyoServerMethodNameExchange isEqualToString:response.method]) {
-            [YoyoPopView createTipLabel:@"SDK兑换成功!"];
-            [weakSelf.exchangeView removeFromSuperview];
-        }
-        
-    }];
-}
-
-/**
- *  事件回调处理
- */
-- (void) handleEventCallBack {
-    __weak typeof(self) weakSelf = self;
-    [[YoyoSdkTool shareInstance] setEventBlock:^(YoyoEvent event, id data) {
-        switch (event) {
-            case YoyoEventExchange:
-                [weakSelf showExchangeView];
-                break;
-            case YoyoEventLogin:
-                [weakSelf showLoginView];
-                break;
-            case YoyoEventShare:
-                [weakSelf shareData:data];
-                break;
-            case YoyoEventServerErrorMsg:
-                NSLog(@"statusStr = %@",data);
-                break;
-                
-            default:
-                break;
-        }
-        
-    }];
-}
 /**
  *  登录处理
  */
-- (void) showLoginView {
+- (YoyoPopView*) showLoginView {
     YoyoPopView *popView = [[YoyoPopView alloc] init];
     popView.frame = self.view.bounds;
     __weak typeof(self) weakSelf = self;
@@ -171,7 +154,7 @@
                 if (StringIsEmpty(openID) || StringIsEmpty(token)) {
                     return ;
                 }
-                [YoyoApi loginWithOpenID:openID token:token];
+                [YoyoSdkTool yoyoSdkToolLoginWithOpenID:openID token:token];
             } else {
                 [YoyoPopView createTipLabel:@"SDK登录失败!"];
             }
@@ -185,6 +168,7 @@
     [self.window addSubview:popView];
     
     self.loginView = popView;
+    return popView;
 }
 
 /**
@@ -212,7 +196,7 @@
                     [YoyoPopView createTipLabel:@"输入字符不合法!"];
                     return ;
                 }
-                [YoyoApi exchangeWithMount:amount orderId:orderID token:token];
+                [YoyoSdkTool yoyoSdkToolExchangeWithMount:amount orderId:orderID token:token];
             } else {
                 [YoyoPopView createTipLabel:@"SDK兑换失败!"];
             }
@@ -265,10 +249,6 @@
 }
 
 #pragma mark - setter Or Getter
--(YoyoSingerListRecord *)singerListRecord{
-    return [YoyoSdkTool shareInstance].singerListRecord;
-}
-
 -(UILabel *)titleLabel{
     if (!_titleLabel) {
         UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 38, 0, 0)];
@@ -291,7 +271,7 @@
         switchListButton.frame = CGRectMake(switchListButtonX, switchListButtonY, switchListButtonW, switchListButtonH);
         switchListButton.titleLabel.font = [UIFont systemFontOfSize:15];
         [switchListButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [switchListButton setTitle:@"跳转房间开关功能页" forState:UIControlStateNormal];
+        [switchListButton setTitle:@"SDK其他功能" forState:UIControlStateNormal];
         [switchListButton addTarget:self action:@selector(jumpToSwitchListViewControler) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:switchListButton];
         _switchListButton = switchListButton;
@@ -314,16 +294,6 @@
         [self.view addSubview:collectionView];
     }
     return _collectionView;
-}
-
--(UIActivityIndicatorView *)loadingView{
-    if (!_loadingView) {
-        UIActivityIndicatorView *loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [self.view addSubview:loadingView];
-        loadingView.center = self.view.center;
-        _loadingView = loadingView;
-    }
-    return _loadingView;
 }
 
 -(UIWindow *) window{

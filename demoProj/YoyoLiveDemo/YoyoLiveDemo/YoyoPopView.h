@@ -14,7 +14,6 @@ typedef void(^OnClickCancelBlock)();
 
 @interface YoyoPopView : UIControl
 
-+ (instancetype) YoyoPopView;
 /**
  *  初始化弹出页面
  *
@@ -35,4 +34,12 @@ typedef void(^OnClickCancelBlock)();
  *  @param tipStr 提示字符串
  */
 + (void) createTipLabel:(NSString*)tipStr;
+
+/**
+ *  loadingView
+ *
+ */
++ (void) startLoadingViewWithSuperView:(UIView*)superView;
++ (void) endLoadingView;
+
 @end

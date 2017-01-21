@@ -36,15 +36,17 @@
 
 @property (nonatomic, strong) UITextView *textView;
 
+
 @end
+
+/**
+ *  loadingView
+ */
+ UIActivityIndicatorView *loadingView;
 @implementation YoyoPopView
 
-#pragma mark -Life Cycle
 
-+ (instancetype) YoyoPopView {
-    YoyoPopView *popView = [[YoyoPopView alloc] init];
-    return popView;
-}
+#pragma mark -Life Cycle
 
 - (instancetype) init {
     if (self = [super init]) {
@@ -52,6 +54,23 @@
     }
     return self;
 }
+
+/**
+ *  loadingView
+ *
+ */
++ (void) startLoadingViewWithSuperView:(UIView*)superView {
+    loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [superView addSubview:loadingView];
+    loadingView.center = superView.center;
+    [loadingView startAnimating];
+}
+
++ (void) endLoadingView {
+    [loadingView stopAnimating];
+    [loadingView removeFromSuperview];
+}
+
 -(void) initYoyoPopViewWithTestFilePlaceNameArr:(NSArray*)NameArr title:(NSString*)title OnClickConfigureBlock:(OnClickConfigureBlock)configureCallBack{
     [self initYoyoPopViewWithTestFilePlaceNameArr:NameArr title:title OnClickConfigureBlock:configureCallBack onCancel:nil];
 }
@@ -268,4 +287,15 @@
     }
     return _inputViewArr;
 }
+
+//-(UIActivityIndicatorView *)loadingView{
+//    if (!_loadingView) {
+//        UIActivityIndicatorView *loadingView =
+//        [self.view addSubview:loadingView];
+//        loadingView.center = self.view.center;
+//        _loadingView = loadingView;
+//    }
+//    return _loadingView;
+//}
+
 @end

@@ -31,17 +31,17 @@
 @property (nonatomic, weak) id<YoyoVideoBridgeNotifyAppEventDelegate> videoDelegate;
 
 /**
- *   初始化方法
+ *   单例方法
  */
 + (instancetype) shareInstance;
 
 /**
- *  版本号
+ *  sdk版本号
  */
 + (NSString *) version;
 
 /**
- *  设置是否为SDK调试服务器,默认为正式服务器 (请在初始化sdk之前调用)
+ *  设置是否使用SDK调试服务器,默认为正式服务器 (请在初始化sdk之前调用)
  *  调试时可以使用此服务器，上线后必须使用正式服务器（不调用此方法，默认就是正式服务器）
  *  
  *  @param isDebug 是否使用调试服务器。
@@ -49,6 +49,11 @@
  *  @return 操作是否成功
  */
 + (BOOL) setUseDebugSDKServer:(BOOL) isDebug;
+
+/**
+ * 是否适用https 默认开启
+ */
+@property (nonatomic, unsafe_unretained) BOOL useHttps;
 
 /**
  *  设置是否显示SDK内部测试log，默认关闭
@@ -60,32 +65,20 @@
 + (BOOL) setDebugLogEnable:(BOOL) enable;
 
 /**
- *  是否开启第三方分享功能，如果关闭，房间页面内看不到分享按钮，默认关闭
+ *  分享平台定制功能，在开启第三方分享的情况下，可调用此方法添加想要分享的目标平台，目前支持qq好友，qq空间，微信好友，微信朋友圈，新浪微博，剪贴板等
+ *  在参数sharePlatform数组内传入shareType的枚举值即可，若不调用此方法且开启分享功能，默认可分享到上述所有平台
  *
- *  @param enable 是否开启
- *
- *  @return 操作是否成功
+ *  @param sharePlatforms 要分享的平台，数组元素从 YoyoShareType 里面取。传入空值nil关闭分享。
+ *  @return 是否使用指定参数开启分享功能
  */
-+ (BOOL) setThirdShareEnable:(BOOL) enable;
++ (BOOL) setThirdSharePlatform:(NSArray *)sharePlatforms;
 
 /**
- *  sdk内部调用的接口，如果服务端返回错误，可能会有一个系统默认的提示框。用此开关可以控制是否显示此提示框。
- *  默认为打开。
- *  如果设置为关闭，不会弹出任何内容，错误消息会通过 YoyoEventServerErrorMsg 事件通知APP，可以定制APP自己风格的显示框。
- *
- *  @param enable 是否打开
- *
- *  @return 操作是否成功
- */
-+ (BOOL) setServerErrorMsgPopViewEnable:(BOOL) enable;
-
-/**
- *  SDK初始化，必须调用此接口初始化SDK，否则SDK无法使用。参数由SDK服务端提供。(默认支持bugly)
+ *  SDK初始化，必须调用此接口初始化SDK，否则SDK无法使用。参数由SDK服务端提供.
  *
  *  @return 是否成功调用接口
  */
 + (BOOL) registerAppWithAppkey:(NSString *)appkey privateKey:(NSString *)privateKey;
-+ (BOOL) registerAppWithAppkey:(NSString *)appkey privateKey:(NSString *)privateKey isSupportBugly:(BOOL)isSupport;
 
 /**
  *  登录SDK，APP内如果登录了，必须调用此接口登录SDK
@@ -150,75 +143,4 @@
  */
 + (BOOL) exchangeWithMount:(NSInteger)mount orderId:(NSString *)orderId token:(NSString *)token;
 
-/**
- *  是否支持兑换悠币功能（默认支持）
- *
- *  @param isSupport 是否支持
- *
- *  @return 是否操作成功
- */
-+ (BOOL) setIsExchangeSupport:(BOOL) isSupport;
-
-/**
- *  是否支持开通守护功能（默认支持）
- *
- *  @param isSupport 是否支持
- *
- *  @return 是否操作成功
- */
-+ (BOOL) setIsOpenGuardSupport:(BOOL) isSupport;
-
-/**
- *  直接请求SDK服务器，此方法返回数据不通过serverDelegate，只通过callback block返回。
- *
- *  @param method   方法名
- *  @param params   参数
- *  @param callback 结果数据（json 格式）
- *
- *  @return 是否成功调用接口
- */
-+(BOOL) HttpPost: (NSString *)method params: (id) params callback:(void (^)(id))callback;
-
-/**
- *  获取完整的图片Url，调用接口返回的图片地址可能是相对路径，调用此方法，返回完整的地址。头像和其他图片调用不同的方法。
- *
- *  @param urlTail
- *
- *  @return 完整的url
- */
-+ (NSString *) getFullImageUrl:(NSString *)urlTail;
-+ (NSString *) getFullAvatarUrl:(NSString *)urlTail;
-
-@end
-
-/**
- * 不支持的功能类型
- */
-typedef enum : NSUInteger {
-    YoyoApiNotSupportFunctionTypeExchange,//兑换
-    YoyoApiNotSupportFunctionTypeOpenGuard,//开通守护
-} YoyoApiNotSupportFunctionType;
-
-/**
- *  当用户选择了不支持的功能，通过实现此方法，给用户提示。
- */
-@protocol YoyoApiNotSupportFunctionTipDelegate <NSObject>
--(void) onNotSupportFunction:(YoyoApiNotSupportFunctionType) funcType tip:(NSString *)tip;
-@end
-
-@interface YoyoApi (NotSupportFunction)
-/**
- *  是否支持兑换功能
- */
-@property (nonatomic, unsafe_unretained) BOOL isSupportExchange;
-
-/**
- *  是否支持开启守护功能
- */
-@property (nonatomic, unsafe_unretained) BOOL isSupportOpenGuard;
-
-/**
- *  如果当前功能不可用，通过此代理提示用户。
- */
-@property (nonatomic, weak) id<YoyoApiNotSupportFunctionTipDelegate> notSupportFunctionTipDelegate;
 @end

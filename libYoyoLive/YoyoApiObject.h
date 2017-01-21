@@ -157,6 +157,11 @@ typedef enum : NSUInteger {
  *  方法名
  */
 @property (nonatomic, copy) NSString *method;
+
+/*
+ * 额外数据
+ */
+@property (nonatomic, strong) id extraData;
 @end
 
 

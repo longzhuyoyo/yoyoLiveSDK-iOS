@@ -14,7 +14,6 @@
 		A4740F011DB9C368006CF2F3 /* YoyoKsyPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A4740EFF1DB9C368006CF2F3 /* YoyoKsyPlayer.m */; };
 		A4740F021DB9C9E7006CF2F3 /* KSYMediaPlayerDy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4740EF91DB9C30B006CF2F3 /* KSYMediaPlayerDy.framework */; };
 		A4740F031DB9C9E7006CF2F3 /* KSYMediaPlayerDy.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A4740EF91DB9C30B006CF2F3 /* KSYMediaPlayerDy.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A4740F061DB9E51F006CF2F3 /* Bugly.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4740F051DB9E51F006CF2F3 /* Bugly.framework */; };
 		A4FF2CD41DB3836100FAFF0C /* libYoyoLive.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A4FF2CD31DB3836100FAFF0C /* libYoyoLive.bundle */; };
 		A4FF5F011DB32E7000BBC8C0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A4FF5F001DB32E7000BBC8C0 /* main.m */; };
 		A4FF5F041DB32E7000BBC8C0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A4FF5F031DB32E7000BBC8C0 /* AppDelegate.m */; };
@@ -87,7 +86,6 @@
 		A4740EFD1DB9C368006CF2F3 /* YoyoCustomVideoPlayerKsy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YoyoCustomVideoPlayerKsy.m; sourceTree = "<group>"; };
 		A4740EFE1DB9C368006CF2F3 /* YoyoKsyPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YoyoKsyPlayer.h; sourceTree = "<group>"; };
 		A4740EFF1DB9C368006CF2F3 /* YoyoKsyPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YoyoKsyPlayer.m; sourceTree = "<group>"; };
-		A4740F051DB9E51F006CF2F3 /* Bugly.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bugly.framework; path = ../../../libYoyoLive/Bugly.framework; sourceTree = "<group>"; };
 		A4FF2CD31DB3836100FAFF0C /* libYoyoLive.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = libYoyoLive.bundle; path = ../../libYoyoLive/libYoyoLive.bundle; sourceTree = "<group>"; };
 		A4FF5EFC1DB32E7000BBC8C0 /* YoyoLiveDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YoyoLiveDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4FF5F001DB32E7000BBC8C0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -191,7 +189,6 @@
 				A4740F021DB9C9E7006CF2F3 /* KSYMediaPlayerDy.framework in Frameworks */,
 				AED776FB1DB89AD600AF9216 /* Security.framework in Frameworks */,
 				AED776F91DB89ACF00AF9216 /* SystemConfiguration.framework in Frameworks */,
-				A4740F061DB9E51F006CF2F3 /* Bugly.framework in Frameworks */,
 				A4740E941DB71C41006CF2F3 /* libiconv.tbd in Frameworks */,
 				A4740EFA1DB9C30B006CF2F3 /* KSYMediaPlayerDy.framework in Frameworks */,
 				A4740E771DB62C6D006CF2F3 /* libicucore.tbd in Frameworks */,
@@ -202,6 +199,42 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A43A3D5A1E33DB3F00D1AA7C /* sdk */ = {
+			isa = PBXGroup;
+			children = (
+				A4740EFB1DB9C34A006CF2F3 /* ksyplayer */,
+				AE137AE91DB4E06900A2CF40 /* YoyoSdkTool.h */,
+				AE137AEA1DB4E06900A2CF40 /* YoyoSdkTool.m */,
+			);
+			name = sdk;
+			sourceTree = "<group>";
+		};
+		A43A3D5B1E33DB5300D1AA7C /* sdk-help */ = {
+			isa = PBXGroup;
+			children = (
+				A4740E641DB60888006CF2F3 /* third-party */,
+				A43A3D5C1E33DB5D00D1AA7C /* view */,
+			);
+			name = "sdk-help";
+			sourceTree = "<group>";
+		};
+		A43A3D5C1E33DB5D00D1AA7C /* view */ = {
+			isa = PBXGroup;
+			children = (
+				AE94DB6B1DB636500075769E /* YoyoSwitchListViewController.h */,
+				AE94DB6C1DB636500075769E /* YoyoSwitchListViewController.m */,
+				AEE02DE61DB755F2007691BA /* YoyoSdkTool+Args.h */,
+				AE137AA01DB4AFA000A2CF40 /* YoyoPopView.h */,
+				AE137AA11DB4AFA000A2CF40 /* YoyoPopView.m */,
+				A4FF5F7F1DB3668200BBC8C0 /* SingerCell.h */,
+				A4FF5F801DB3668200BBC8C0 /* SingerCell.m */,
+				A4FF5F811DB3668200BBC8C0 /* SingerCell.xib */,
+				A4FF5F051DB32E7000BBC8C0 /* ViewController.h */,
+				A4FF5F061DB32E7000BBC8C0 /* ViewController.m */,
+			);
+			name = view;
+			sourceTree = "<group>";
+		};
 		A4740E641DB60888006CF2F3 /* third-party */ = {
 			isa = PBXGroup;
 			children = (
@@ -211,18 +244,6 @@
 				AE137AE21DB4CAE200A2CF40 /* AFServer.m */,
 			);
 			name = "third-party";
-			sourceTree = "<group>";
-		};
-		A4740EE41DB9C265006CF2F3 /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				A4FF5F7F1DB3668200BBC8C0 /* SingerCell.h */,
-				A4FF5F801DB3668200BBC8C0 /* SingerCell.m */,
-				A4FF5F811DB3668200BBC8C0 /* SingerCell.xib */,
-				A4FF5F051DB32E7000BBC8C0 /* ViewController.h */,
-				A4FF5F061DB32E7000BBC8C0 /* ViewController.m */,
-			);
-			name = Classes;
 			sourceTree = "<group>";
 		};
 		A4740EF81DB9C30B006CF2F3 /* libKsyMediaPlayer */ = {
@@ -289,9 +310,8 @@
 		A4FF5EFE1DB32E7000BBC8C0 /* YoyoLiveDemo */ = {
 			isa = PBXGroup;
 			children = (
-				A4740EE41DB9C265006CF2F3 /* Classes */,
-				A4740E641DB60888006CF2F3 /* third-party */,
-				AED15C621DB5BE9100EC6698 /* yoyo */,
+				A43A3D5B1E33DB5300D1AA7C /* sdk-help */,
+				A43A3D5A1E33DB3F00D1AA7C /* sdk */,
 				A4FF5F021DB32E7000BBC8C0 /* AppDelegate.h */,
 				A4FF5F031DB32E7000BBC8C0 /* AppDelegate.m */,
 				A4FF5F081DB32E7000BBC8C0 /* Main.storyboard */,
@@ -404,25 +424,9 @@
 			path = "UIKit+AFNetworking";
 			sourceTree = "<group>";
 		};
-		AED15C621DB5BE9100EC6698 /* yoyo */ = {
-			isa = PBXGroup;
-			children = (
-				A4740EFB1DB9C34A006CF2F3 /* ksyplayer */,
-				AE94DB6B1DB636500075769E /* YoyoSwitchListViewController.h */,
-				AE94DB6C1DB636500075769E /* YoyoSwitchListViewController.m */,
-				AEE02DE61DB755F2007691BA /* YoyoSdkTool+Args.h */,
-				AE137AE91DB4E06900A2CF40 /* YoyoSdkTool.h */,
-				AE137AEA1DB4E06900A2CF40 /* YoyoSdkTool.m */,
-				AE137AA01DB4AFA000A2CF40 /* YoyoPopView.h */,
-				AE137AA11DB4AFA000A2CF40 /* YoyoPopView.m */,
-			);
-			name = yoyo;
-			sourceTree = "<group>";
-		};
 		AEE527781DB46E9100572A8C /* libYoyoLive */ = {
 			isa = PBXGroup;
 			children = (
-				A4740F051DB9E51F006CF2F3 /* Bugly.framework */,
 				AE137AE41DB4DA5D00A2CF40 /* libYoyoLive.a */,
 				AEE527731DB46E4A00572A8C /* YoyoApi.h */,
 				AEE527741DB46E4A00572A8C /* YoyoApiObject.h */,
