@@ -31,6 +31,11 @@
 @property (nonatomic, weak) id<YoyoVideoBridgeNotifyAppEventDelegate> videoDelegate;
 
 /**
+ * 是否使用https 默认开启
+ */
+@property (nonatomic, unsafe_unretained) BOOL useHttps;
+
+/**
  *   单例方法
  */
 + (instancetype) shareInstance;
@@ -49,11 +54,6 @@
  *  @return 操作是否成功
  */
 + (BOOL) setUseDebugSDKServer:(BOOL) isDebug;
-
-/**
- * 是否适用https 默认开启
- */
-@property (nonatomic, unsafe_unretained) BOOL useHttps;
 
 /**
  *  设置是否显示SDK内部测试log，默认关闭
