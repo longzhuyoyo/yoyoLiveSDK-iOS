@@ -122,6 +122,13 @@
  */
 + (BOOL) enterRoomWithRoomId:(NSString*) roomId;
 
+/*
+ * 进入随机直播间
+ *
+ * @return 是否调用成功
+ */
++ (BOOL) enterRandomRoom;
+
 /**
  *  更新用户信息。为保持APP内昵称和头像同SDK保持一致，APP修改用户信息的时候，如果头像和昵称发生了变化，需要通知sdk修改这些信息
  *

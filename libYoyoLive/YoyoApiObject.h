@@ -185,6 +185,7 @@ extern const NSString *YoyoServerMethodNameLogin;//登录接口
 extern const NSString *YoyoServerMethodNameGetSingerList;//获取主播列表接口
 extern const NSString *YoyoServerMethodNameExchange;//兑换接口
 extern const NSString *YoyoServerMethodNameUpdateUserInfo;//更新用户信息接口
+extern const NSString *YoyoServerMethodNameEnterRandomRoom;//进入随机房间接口
 
 #pragma mark - YoyoSingerDetailRecord
 @interface YoyoSingerDetailRecord : YoyoBaseRecord
