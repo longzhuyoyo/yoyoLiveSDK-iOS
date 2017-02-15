@@ -232,5 +232,26 @@ extern const NSString *YoyoServerMethodNameUpdateUserInfo;//更新用户信息�
 
 @end
 
+#pragma mark - appstore 配置模型
+@interface YoyoRechargeItemRecord : NSObject
+
+/**
+ *  人民币金额
+ */
+@property (nonatomic, copy) NSNumber *cny;
+
+/**
+ *  产品id
+ */
+@property (nonatomic, copy) NSString *identifier;
+
+@end
+
+//充值类型
+typedef enum : NSUInteger {
+    YoyoApiExchangeTypeExchange,//sdk无支付页面
+    YoyoApiExchangeTypeRecharge,//sdk自带支付页面
+} YoyoApiExchangeType;
+
 @interface YoyoApiObject : NSObject
 @end

@@ -31,7 +31,7 @@
     }
     
     //主播大图
-    [self.singerImage sd_setImageWithURL:[NSURL URLWithString:singerRecord.cover]];
+    [self.singerImage sd_setImageWithURL:[NSURL URLWithString:singerRecord.cover] placeholderImage:nil options:SDWebImageAllowInvalidSSLCertificates];
     self.singerImage.layer.masksToBounds = YES;
     
     //主播名

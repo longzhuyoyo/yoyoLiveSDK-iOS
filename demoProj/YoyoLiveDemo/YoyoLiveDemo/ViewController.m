@@ -91,7 +91,12 @@
 }
 
 - (void) yoyoSdkToolShowExchangeView {
-    [self showExchangeView];
+    if ([YoyoApi shareInstance].exchangeType == YoyoApiExchangeTypeExchange) {
+        [self showExchangeView];
+    }else{
+        //TODO
+        [YoyoApi appstorePaymentFailed];
+    }
 }
 
 - (void) yoyoSdkToolCallBackSingerListDataWithSingerRecord:(YoyoSingerListRecord*)singerListRecord {

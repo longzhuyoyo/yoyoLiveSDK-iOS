@@ -35,6 +35,12 @@
  */
 @property (nonatomic, unsafe_unretained) BOOL useHttps;
 
+/*
+ * 选择获取悠币方式：兑换还是充值。
+ * 此值不需要设置，特殊情况下需要联系sdk开发人员
+ */
+@property (nonatomic, unsafe_unretained) YoyoApiExchangeType exchangeType;
+
 /**
  *   单例方法
  */
@@ -50,10 +56,11 @@
  *  调试时可以使用此服务器，上线后必须使用正式服务器（不调用此方法，默认就是正式服务器）
  *  
  *  @param isDebug 是否使用调试服务器。
+ *  @param debugHost 调试Host
  *
  *  @return 操作是否成功
  */
-+ (BOOL) setUseDebugSDKServer:(BOOL) isDebug;
++ (BOOL) setUseDebugSDKServer:(BOOL) isDebug debugHost:(NSString *)debugHost;
 
 /**
  *  设置是否显示SDK内部测试log，默认关闭
@@ -132,10 +139,34 @@
  */
 + (BOOL) getSingerList;
 
-/**
- *  兑换悠币
+/*
+ * 设置充值页面计费点信息
  *
- *  @param mount   兑换金额 （单位：人民币 元)
+ * @param productIdArray 计费点数组，数组内数据类型为YoyoRechargeItemRecord
+ * 
+ * @return 是否设置成功
+ *
+ */
++ (BOOL) setAppstorePaymentProductIdArray:(NSArray<YoyoRechargeItemRecord *> *)productIdArray;
+
+/*
+ * appstore支付成功后向sdk传入reciptData
+ *
+ * @param reciptData
+ * 
+ * @return 函数是否调用成功
+ */
++ (BOOL) appstorePaymentSuccWithReciptData:(NSData *) reciptData;
+
+/*
+ * appstore支付失败后，请调用此方法
+ */
++ (void) appstorePaymentFailed;
+
+/**
+ *  兑换/充值悠币
+ *
+ *  @param mount   兑换/充值金额 （单位：人民币 元)
  *  @param orderId APP向服务器请求后生成的订单号
  *  @param token   APP服务器为本次请求生成的token，有时间和次数限制
  *
@@ -143,4 +174,10 @@
  */
 + (BOOL) exchangeWithMount:(NSInteger)mount orderId:(NSString *)orderId token:(NSString *)token;
 
+/**
+ *  清理sdk缓存
+ *  @param completion 清理结束回调
+ *  @return 是否成功调用函数
+ */
++ (BOOL) clearCachesWithCompletion:(void(^)())completion;
 @end
