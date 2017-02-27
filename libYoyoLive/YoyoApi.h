@@ -187,4 +187,20 @@
  *  @return 是否成功调用函数
  */
 + (BOOL) clearCachesWithCompletion:(void(^)())completion;
+
+/*
+ * 非wifi情况下，当前网络是否可以播放视频。
+ * 设为YES：
+ * 若当前可以播放视频，则直接播放视频。
+ * 若当前不可播放视频，则没有变化。
+ * 设为NO：
+ * 若当前在播放视频，则提示当前网络无法播放视频，断开视频。
+ * 若当前没有播放视频，则启动视频时，提示当前无法播放视频。
+ *
+ * @param shouldPlayVideo
+ *
+ * @return 是否设置成功
+ *
+ */
++(BOOL) setNonWifiShouldPlayVideo:(BOOL) shouldPlayVideo;
 @end
